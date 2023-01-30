@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <EditText
+        android:background="@color/material_dynamic_neutral80"
+        android:layout_marginBottom="10dp"
+        android:hint="ID 입력"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </EditText>
+
+    <EditText
+        android:layout_marginBottom="10dp"
+        android:hint="Pass 입력"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </EditText>
+
+    <EditText
+        android:layout_marginBottom="10dp"
+        android:hint="Name 입력"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </EditText>
+
+    <Button
+        android:layout_gravity="center_horizontal"
+        android:text="등록"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </Button>
+
+
+</LinearLayout>
