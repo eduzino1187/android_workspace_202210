@@ -36,8 +36,9 @@ public class SecondActivity extends AppCompatActivity {
 
         //모든~~ 뷰는 해당 컨트롤러에 소속관계가 있어야 하므로 생성시 생성자의 인수로
         //어느 액티비티소속인지를 지정해야 한다..
-        GalleryItem wrapper=new GalleryItem(this, t_input.getText().toString());
-        box.addView(wrapper);
+        //GalleryItem wrapper=new GalleryItem(this, t_input.getText().toString());
+        GalleryItem2 wrapper=new GalleryItem2(this, t_input.getText().toString());
+        box.addView(wrapper.layout);
     }
 }
 
