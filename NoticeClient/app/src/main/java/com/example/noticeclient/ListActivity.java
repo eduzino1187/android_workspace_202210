@@ -9,10 +9,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,10 +88,43 @@ public class ListActivity extends AppCompatActivity {
     }
     public void requestList(){
         //GET방식의 요청시도 !! json 으로 가져오기
+        BufferedReader buffr=null;
+        InputStreamReader reader=null;
+
         try {
             URL url = new URL("http://172.30.1.27:7777/rest/notice/list");
+            URLConnection uCon=url.openConnection();
+            HttpURLConnection httpCon=(HttpURLConnection) uCon;
+            httpCon.setRequestMethod("GET");
+            httpCon.setDoInput(true);
+
+            int code=httpCon.getResponseCode(); //200, 404, 500...
+            Log.d(TAG, "서버의 응답정보"+code);
+
+            if(code == HttpURLConnection.HTTP_OK){
+                reader = new InputStreamReader(httpCon.getInputStream(),"UTF-8");
+                buffr = new BufferedReader(reader);
+
+                StringBuilder sb = new StringBuilder();
+                String msg=null;
+                while(true){
+                    msg=buffr.readLine();
+                    if(msg==null)break;
+                    sb.append(msg);
+                }
+                Log.d(TAG, sb.toString());
+
+                //파싱~~~~~~~
+                //JSONObject jsonObject = new JSONObject(sb.toString());
+
+            }
+
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally{
+
         }
     }
 
