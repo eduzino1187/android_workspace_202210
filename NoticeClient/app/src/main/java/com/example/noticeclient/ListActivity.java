@@ -1,9 +1,13 @@
 package com.example.noticeclient;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,6 +34,10 @@ public class ListActivity extends AppCompatActivity {
     List<String> list=new ArrayList<String>(); // MVC중 데이터 즉 Model이다
     ArrayAdapter<String> adapter; // MVC중 컨트롤러이다
     NoticeAdapter noticeAdapter; //복합된 아이템을 보여주기 위한 재정의된 어댑터
+
+
+    Handler handler; //개발자가 정의한 쓰레드가 메인쓰레드로 작업하고싶은 업무가
+                                // 있을 경우 핸들러에게 부탁하면 된다.
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +79,14 @@ public class ListActivity extends AppCompatActivity {
             startActivity(intent);
 
         });
+
+        handler = new Handler(Looper.getMainLooper()){
+            public void handleMessage(@NonNull Message msg) {
+                //이 메서드 영역은 main쓰레드에 의해 구현된다!
+                //즉 디자인 제어가 가능...
+                noticeAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     @Override
@@ -110,7 +126,8 @@ public class ListActivity extends AppCompatActivity {
 
             // 어댑터에 반영하기
             noticeAdapter.noticeList=list;
-            noticeAdapter.notifyDataSetChanged();
+            //핸들러에게 부탁하자!!
+            handler.sendEmptyMessage(0);
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
