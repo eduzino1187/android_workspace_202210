@@ -14,6 +14,7 @@ public class ListActivity extends AppCompatActivity {
     ListView listView;
     List<String> list=new ArrayList<String>(); // MVC중 데이터 즉 Model이다
     ArrayAdapter<String> adapter; // MVC중 컨트롤러이다
+    NoticeAdapter noticeAdapter; //복합된 아이템을 보여주기 위한 재정의된 어댑터
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +38,9 @@ public class ListActivity extends AppCompatActivity {
         //R : 현재 나의 프로젝트의 res (나만 사용가능)
         //android.R : 시스템차원에서 지원하는 res (나말고 다른 프로젝트도 사용가능)
         adapter=new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+        noticeAdapter = new NoticeAdapter(this);
 
         //javaSE 처럼  new JTable(model) 와 같이 뷰와 컨트롤러를 연결해야 한다.l
-        listView.setAdapter(adapter);
+        listView.setAdapter(noticeAdapter);
     }
 }
