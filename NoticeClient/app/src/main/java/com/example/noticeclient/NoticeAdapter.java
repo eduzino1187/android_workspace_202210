@@ -1,6 +1,7 @@
 package com.example.noticeclient;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,14 +82,26 @@ public class NoticeAdapter extends BaseAdapter {
         //레코드 수만큼 인플레이션 시키기!!!
         if(view ==null) { //한번도 화면에 등장한 적이 없는 뷰라면 개발자가 생성
             view= layoutInflater.inflate(R.layout.item_notice, viewGroup, false);
-            Button bt_view = view.findViewById(R.id.bt_view);
-            bt_view.setText(i + "");
         }
+
+        Button bt_view = view.findViewById(R.id.bt_view);
+        bt_view.setText(i + "");
+
 
         TextView t_title=view.findViewById(R.id.t_title);
         TextView t_writer=view.findViewById(R.id.t_writer);
         TextView t_regdate=view.findViewById(R.id.t_regdate);
+
         Notice notice=noticeList.get(i);
+
+        bt_view.setOnClickListener((v)->{
+            Log.d(TAG, "당신이 선택한 글의  idx는 "+notice.getNotice_idx());
+            //상세 페이지를 담당하는 액티비티 호출 (new 불가 , 서블릿과 동일)
+            Intent intent = new Intent( listActivity, DetailActivity.class);
+            intent.putExtra("notice_idx", notice.getNotice_idx());
+            listActivity.startActivity(intent);
+
+        });
 
         t_title.setText(notice.getTitle());
         t_writer.setText(notice.getWriter());
