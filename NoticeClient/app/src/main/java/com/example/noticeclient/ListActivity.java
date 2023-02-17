@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -86,6 +87,37 @@ public class ListActivity extends AppCompatActivity {
         };
         thread.start();
     }
+
+    public void convertJsonToList(JSONArray jsonArray){
+        List<Notice> list = new ArrayList<Notice>();
+
+        Log.d(TAG, "json length "+jsonArray.length());
+
+        try {
+            for(int i=0;i< jsonArray.length();i++){
+                JSONObject json=(JSONObject) jsonArray.get(i);
+
+                Notice notice = new Notice(); //empty notice
+                notice.setNotice_idx(json.getInt("notice_idx"));
+                notice.setTitle(json.getString("title"));
+                notice.setWriter(json.getString("writer"));
+                notice.setContent(json.getString("content"));
+                notice.setRegdate(json.getString("regdate"));
+                notice.setHit(json.getInt("hit"));
+
+                list.add(notice);
+            }
+
+            // 어댑터에 반영하기
+            noticeAdapter.noticeList=list;
+            noticeAdapter.notifyDataSetChanged();
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public void requestList(){
         //GET방식의 요청시도 !! json 으로 가져오기
         BufferedReader buffr=null;
@@ -115,15 +147,34 @@ public class ListActivity extends AppCompatActivity {
                 Log.d(TAG, sb.toString());
 
                 //파싱~~~~~~~
-                //JSONObject jsonObject = new JSONObject(sb.toString());
 
+                JSONArray jsonArray = new JSONArray(sb.toString());
+                // []  --> ArrayList   {} --> Notice
+                convertJsonToList(jsonArray);
             }
 
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }finally{
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } finally{
+            if(reader!=null){
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if(buffr!=null){
+                try {
+                    buffr.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
         }
     }
