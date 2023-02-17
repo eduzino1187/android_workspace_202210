@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +75,25 @@ public class NoticeAdapter extends BaseAdapter {
 
         Log.d(TAG, "i = "+i+", view = "+view+", viewGroup"+viewGroup);
 
-        //레코드 수만큼 인플레이션 시키기!!!
-        View wrapper=layoutInflater.inflate(R.layout.item_notice, viewGroup, false);
-        Button bt_view=wrapper.findViewById(R.id.bt_view);
-        bt_view.setText(i+"");
+        //매개변수로 넘겨받은  view 가  null인 경우만 인플레이션 시키고,
+        //이미 태어만 뷰가 넘어온 기존의  넘어온 view를 그대로 이용하자
 
-        return wrapper;
+        //레코드 수만큼 인플레이션 시키기!!!
+        if(view ==null) { //한번도 화면에 등장한 적이 없는 뷰라면 개발자가 생성
+            view= layoutInflater.inflate(R.layout.item_notice, viewGroup, false);
+            Button bt_view = view.findViewById(R.id.bt_view);
+            bt_view.setText(i + "");
+        }
+
+        TextView t_title=view.findViewById(R.id.t_title);
+        TextView t_writer=view.findViewById(R.id.t_writer);
+        TextView t_regdate=view.findViewById(R.id.t_regdate);
+        Notice notice=noticeList.get(i);
+
+        t_title.setText(notice.getTitle());
+        t_writer.setText(notice.getWriter());
+        t_regdate.setText(notice.getRegdate());
+
+        return view;
     }
 }
