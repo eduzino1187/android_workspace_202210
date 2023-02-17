@@ -4,16 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListActivity extends AppCompatActivity {
+    private String TAG=this.getClass().getName();
 
     ListView listView;
     List<String> list=new ArrayList<String>(); // MVC중 데이터 즉 Model이다
@@ -59,8 +63,39 @@ public class ListActivity extends AppCompatActivity {
             Intent intent=new Intent(this, RegistActivity.class);
             startActivity(intent);
 
-
-
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //현재 액티비티에 의한 화면이 막 등장하려고 할때..
+        Log.d(TAG, "저 이제 막 보여지려 해요");
+
+        //디자인이 화면에 드러나기전에, 스프링에서 데이터 긁어오기
+        Thread thread = new Thread(){
+            public void run() {
+                requestList();
+            }
+        };
+        thread.start();
+    }
+    public void requestList(){
+        //GET방식의 요청시도 !! json 으로 가져오기
+        try {
+            URL url = new URL("http://172.30.1.27:7777/rest/notice/list");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "저 이제 완전히 보여졌어요");
+    }
 }
+
+
+
+

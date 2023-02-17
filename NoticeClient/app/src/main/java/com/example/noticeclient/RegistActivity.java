@@ -29,6 +29,7 @@ public class RegistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_regist);
 
         Button bt_regist = findViewById(R.id.bt_regist);
+        Button bt_list = findViewById(R.id.bt_list);
         t_title = findViewById(R.id.t_title);
         t_writer = findViewById(R.id.t_writer);
         t_content = findViewById(R.id.t_content);
@@ -36,6 +37,11 @@ public class RegistActivity extends AppCompatActivity {
         bt_regist.setOnClickListener((v)->{
             regist();
         });
+
+        bt_list.setOnClickListener((v)->{
+            finish();
+        });
+
     }
 
     public void regist(){
