@@ -41,7 +41,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent=this.getIntent(); //새로운 인텐트가 아니라, 다른 액티비티에서
         //전달한 인텐트이다!!!
         notice_idx=intent.getIntExtra("notice_idx", 0);
-
+        Log.d(TAG, "이 액티비티가 초기화될때 넘겨받은 notice_idx="+notice_idx);
 
         t_title=findViewById(R.id.t_title);
         t_writer=findViewById(R.id.t_writer);
@@ -72,6 +72,11 @@ public class DetailActivity extends AppCompatActivity {
             notice.setContent(json.getString("content"));
             notice.setRegdate(json.getString("regdate"));
             notice.setHit(json.getInt("hit"));
+
+            //화면에 반영하기(네트워크 통신은 개발자 정의 쓰레드에 의해 진행되었으므로
+            // 화면에 반영하는 권한은 main쓰레드에 있기 때문에 핸들러에 의한 간접 제어.)
+            handler.sendEmptyMessage(0);
+
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
