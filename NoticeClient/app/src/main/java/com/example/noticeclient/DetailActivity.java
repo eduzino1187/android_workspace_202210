@@ -17,8 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +33,8 @@ public class DetailActivity extends AppCompatActivity {
     EditText t_title, t_writer, t_content;
     int notice_idx;
     Handler handler;
+    Handler handler2;
+
     Notice notice;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,32 @@ public class DetailActivity extends AppCompatActivity {
         Button bt_del = findViewById(R.id.bt_del);
         Button bt_list = findViewById(R.id.bt_list);
 
+        //수정하기
+        bt_edit.setOnClickListener((v)->{
+            Thread thread = new Thread(){
+                public void run() {
+                    edit();
+                }
+            };
+            thread.start();
+        });
+
+        //삭제하기
+        bt_del.setOnClickListener((v)->{
+            Thread thread=new Thread(){
+                public void run() {
+                    del();
+                }
+            };
+            thread.start();
+        });
+
+        //목록보기
+        bt_list.setOnClickListener((v)->{
+            goList();
+        });
+
+
         handler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -60,6 +91,76 @@ public class DetailActivity extends AppCompatActivity {
                 t_content.setText(notice.getContent());
             }
         };
+        handler2 = new Handler(Looper.getMainLooper()){
+            public void handleMessage(@NonNull Message msg) {
+                goList();
+            }
+        };
+
+    }
+    public void goList(){
+        this.finish();
+    }
+    public void del(){
+        //GET방식의 요청시도 !! json 으로 가져오기
+        BufferedReader buffr=null;
+        InputStreamReader reader=null;
+
+        try {
+            URL url = new URL("http://172.30.1.27:7777/rest/notice/del?notice_idx="+notice_idx);
+            URLConnection uCon=url.openConnection();
+            HttpURLConnection httpCon=(HttpURLConnection) uCon;
+            httpCon.setRequestMethod("GET");
+            httpCon.setDoInput(true);
+
+            int code=httpCon.getResponseCode(); //200, 404, 500...
+            Log.d(TAG, "서버의 응답정보"+code);
+
+            if(code == HttpURLConnection.HTTP_OK){
+                reader = new InputStreamReader(httpCon.getInputStream(),"UTF-8");
+                buffr = new BufferedReader(reader);
+
+                StringBuilder sb = new StringBuilder();
+                String msg=null;
+                while(true){
+                    msg=buffr.readLine();
+                    if(msg==null)break;
+                    sb.append(msg);
+                }
+                Log.d(TAG, sb.toString());
+
+                //파싱~~~~~~~
+
+                //게시물이 1건이므로, 단수형  JSON이다
+                //JSONObject json = new JSONObject(sb.toString());
+                //convertJsonToObject(json);
+
+                handler2.sendEmptyMessage(0);
+            }
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }  finally{
+            if(reader!=null){
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            if(buffr!=null){
+                try {
+                    buffr.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+
     }
 
     public void  convertJsonToObject(JSONObject json){
@@ -140,10 +241,93 @@ public class DetailActivity extends AppCompatActivity {
                     throw new RuntimeException(e);
                 }
             }
-
         }
+
     }
 
+    //수정하기
+    public void edit(){
+        // Http Request
+        BufferedWriter buffw=null;
+        OutputStreamWriter os=null;
+        DataOutputStream dos=null;
+
+        BufferedReader buffr=null;
+        InputStreamReader is=null;
+
+        try {
+            URL url = new URL("http://172.30.1.27:7777/rest/notice/edit");
+            URLConnection uCon=url.openConnection();
+            HttpURLConnection httpCon=(HttpURLConnection) uCon;
+            httpCon.setRequestMethod("POST");
+            httpCon.setDoOutput(true);
+            httpCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            //보낼 데이터
+            String title=t_title.getText().toString();
+            String writer=t_writer.getText().toString();
+            String content=t_content.getText().toString();
+
+            String postData="title="+title+"&writer="+writer+"&content="+content+"&notice_idx="+notice_idx;
+            os = new OutputStreamWriter(httpCon.getOutputStream(), "UTF-8");
+            buffw=new BufferedWriter(os);
+            //dos = new DataOutputStream(httpCon.getOutputStream());
+            //dos.writeBytes(postData);
+            buffw.write(postData+"\n");
+            buffw.flush();
+
+            //데이터 요청 이후에 입력스트림 만들어야 한다..
+            is = new InputStreamReader(httpCon.getInputStream(), "UTF-8");
+            buffr = new BufferedReader(is);
+
+            StringBuilder sb=new StringBuilder();
+            while(true){
+                String result=buffr.readLine();
+                sb.append(result);
+                if(result==null){
+                    break;
+                }
+            }
+            Log.d(TAG, sb.toString());
+            //수정 성공시 성공메시지 출력 (Alert)
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(is!=null){
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if(buffr!=null){
+                try {
+                    buffr.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if(os!=null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if(buffw!=null){
+                try {
+                    buffw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }
+
+    }
 
 
     protected void onStart() {
