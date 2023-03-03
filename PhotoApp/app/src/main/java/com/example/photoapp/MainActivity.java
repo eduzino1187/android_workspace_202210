@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     File selectedFile; //서버에 전송할 사진 및 미리보기할 사진
     PhotoView photoView;
 
+    UploadManager uploadManager=new UploadManager();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
         Button bt_internal=findViewById(R.id.bt_internal);
         Button bt_external=findViewById(R.id.bt_external);
+        Button bt_regist=findViewById(R.id.bt_regist);
+
         photoView=findViewById(R.id.photoView);
 
         bt_internal.setOnClickListener((v)->{
@@ -42,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
         });
         bt_external.setOnClickListener((v)->{
             openExternal();
+        });
+        bt_regist.setOnClickListener((v)->{
+            Thread thread = new Thread(){
+                public void run() {
+                    upload();
+                }
+            };
+            thread.start();
         });
 
 
@@ -100,6 +113,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }else{
             //구버전 핸드폰이므로 허락이고 뭐고 필요없이 그냥 파일접근하자
+        }
+    }
+
+    public void upload(){
+        Product product= new Product();
+        product.setCategory_idx(1);
+        product.setProduct_name("폴로");
+        product.setBrand("랄프로렌");
+        product.setPrice(250000);
+        product.setDiscount(195000);
+        product.setDetail("good");
+
+        try {
+            uploadManager.regist(product, selectedFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
